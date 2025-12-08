@@ -9,8 +9,6 @@
         reg = <0x3c>;
         width = <128>;
         height = <32>;
-        segment-offset = <0>;
-        com-offset = <0>;
         rotation = <0>;
     };
 };
