@@ -1,7 +1,7 @@
 &i2c0 {
     status = "okay";
-    sda-pin = <22>;    /* P0.20 = SDA = D3 */
-    scl-pin = <20>;    /* P0.22 = SCL = D4 */
+    sda-pin = <20>;    /* P0.20 = SDA = D3 */
+    scl-pin = <22>;    /* P0.22 = SCL = D4 */
     clock-frequency = <400000>;
 
     oled: ssd1306@3c {
