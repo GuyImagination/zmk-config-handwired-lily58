@@ -1,0 +1,16 @@
+&i2c0 {
+    status = "okay";
+    sda-pin = <20>;    /* P0.20 = SDA = D3 */
+    scl-pin = <22>;    /* P0.22 = SCL = D4 */
+    clock-frequency = <400000>;
+
+    oled: ssd1306@3c {
+        compatible = "zmk,oled-ssd1306";
+        reg = <0x3c>;
+        width = <128>;
+        height = <32>;
+        segment-offset = <0>;
+        com-offset = <0>;
+        rotation = <90>;
+    };
+};
