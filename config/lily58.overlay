@@ -1,7 +1,7 @@
 &i2c0 {
     status = "okay";
-    sda-pin = <20>;   /* P0.20 */
-    scl-pin = <22>;   /* P0.22 */
+    sda-pin = <22>;   /* P0.20 */
+    scl-pin = <20>;   /* P0.22 */
     clock-frequency = <400000>;
 };
 
