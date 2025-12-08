@@ -1,6 +1,42 @@
-name: Build ZMK firmware
-on: [push, pull_request, workflow_dispatch]
+name: ZMK Build
+
+on:
+  push:
+    branches: main
+  pull_request:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install west & Zephyr SDK
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install west
+          sudo apt-get update
+          sudo apt-get install -y git cmake ninja-build gperf python3-pip python3-setuptools python3-wheel xz-utils file
+          wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.9/zephyr-sdk-0.16.9-linux-x86_64-setup.run
+          chmod +x zephyr-sdk-0.16.9-linux-x86_64-setup.run
+          sudo ./zephyr-sdk-0.16.9-linux-x86_64-setup.run -- -d /opt/zephyr-sdk-0.16.9 -y
+          export ZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk-0.16.9
+          west init -m config
+          west update
+
+      - name: Build Lily58 Left
+        run: |
+          west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG=config -DSHIELD=lily58_left
+        shell: bash
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lily58_left
+          path: build/zephyr/zmk.uf2
