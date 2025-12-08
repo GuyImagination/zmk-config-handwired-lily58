@@ -1,6 +1,56 @@
-name: Build ZMK firmware
-on: [push, pull_request, workflow_dispatch]
+name: Build ZMK Firmware
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git python3-pip python3-venv ninja-build ccache dfu-util
+
+      - name: Install west
+        run: |
+          pip install --upgrade west
+
+      - name: Initialize west workspace
+        run: |
+          west init -m ./config/west.yml config
+          west update
+
+      - name: Export ZMK environment
+        run: |
+          source config/zmk/zephyr/zephyr-env.sh
+
+      - name: Build left half
+        run: |
+          west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG=config -DSHIELD=lily58_left
+
+      - name: Build right half
+        run: |
+          west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG=config -DSHIELD=lily58_right
+
+      - name: Upload left firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: lily58_left
+          path: build/zephyr/zephyr.hex
+
+      - name: Upload right firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: lily58_right
+          path: build/zephyr/zephyr.hex
