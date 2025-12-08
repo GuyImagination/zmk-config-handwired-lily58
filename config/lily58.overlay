@@ -9,7 +9,7 @@
         reg = <0x3c>;   /* Common OLED I2C address */
         label = "OLED";
         width = <128>;
-        height = <64>;
+        height = <32>;
         rotation = <0>;
     };
 };
