@@ -1,0 +1,15 @@
+&i2c0 {
+    status = "okay";
+    sda-pin = <20>;   /* P0.20 */
+    scl-pin = <22>;   /* P0.22 */
+    clock-frequency = <400000>;
+};
+
+&display {
+    compatible = "solomon,ssd1306fb"; /* or sh1106 if you have that */
+    label = "OLED";
+    height = <64>;
+    width = <128>;
+    rotation = <0>;
+    i2c = <&i2c0>;
+};
