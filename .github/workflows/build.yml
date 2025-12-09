@@ -28,7 +28,9 @@ jobs:
 
       - name: Initialize west workspace
         run: |
-          west init -m ./config/west.yml config
+          mkdir zmk
+          cd zmk
+          west init -m ../config/west.yml
           west update
 
       - name: Export ZMK environment
