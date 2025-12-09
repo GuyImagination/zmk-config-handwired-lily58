@@ -2,57 +2,36 @@ name: Build ZMK Firmware
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y git python3-pip python3-venv ninja-build ccache dfu-util
+      - uses: actions/checkout@v4
 
       - name: Install west
-        run: |
-          pip install --upgrade west
+        run: pipx install west
 
-      - name: Initialize West workspace
+      - name: Initialize west workspace
         run: |
-          mkdir zmk
-          cd zmk
-          west init -m ..   # manifest is in repo root
+          west init -l config
           west update
+          west zephyr-export
 
-      - name: Export ZMK environment
+      - name: Build firmware
         run: |
-          source config/zmk/zephyr/zephyr-env.sh
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=lily58_left -DZMK_CONFIG=$GITHUB_WORKSPACE/config
+          cp build/zephyr/zmk.uf2 firmware_left.uf2
 
-      - name: Build left half
-        run: |
-          west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG=config -DSHIELD=lily58_left
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=lily58_right -DZMK_CONFIG=$GITHUB_WORKSPACE/config
+          cp build/zephyr/zmk.uf2 firmware_right.uf2
 
-      - name: Build right half
-        run: |
-          west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG=config -DSHIELD=lily58_right
-
-      - name: Upload left firmware
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: lily58_left
-          path: build/zephyr/zephyr.hex
-
-      - name: Upload right firmware
-        uses: actions/upload-artifact@v4
-        with:
-          name: lily58_right
-          path: build/zephyr/zephyr.hex
+          name: firmware
+          path: |
+            firmware_left.uf2
+            firmware_right.uf2
