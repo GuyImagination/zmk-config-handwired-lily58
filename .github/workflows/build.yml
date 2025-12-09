@@ -26,11 +26,11 @@ jobs:
         run: |
           pip install --upgrade west
 
-      - name: Initialize west workspace
+      - name: Initialize West workspace
         run: |
           mkdir zmk
           cd zmk
-          west init -m ../config/west.yml
+          west init -m ..   # manifest is in repo root
           west update
 
       - name: Export ZMK environment
