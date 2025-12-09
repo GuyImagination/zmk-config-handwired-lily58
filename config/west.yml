@@ -1,11 +1,15 @@
 manifest:
+  version: 0.13
+
   remotes:
-    - name: zmk
+    - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+
   projects:
     - name: zmk
-      remote: zmk
+      remote: zmkfirmware
       revision: main
-      import: true
+      path: zmk
+
   self:
     path: config

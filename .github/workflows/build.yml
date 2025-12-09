@@ -12,15 +12,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install west using pipx (recommended)
       - name: Install west
         run: pipx install west
 
+      # Initialize the west workspace using your config/west.yml
       - name: Initialize west workspace
         run: |
           west init -l config
           west update
-          west zephyr-export
 
+      # Build firmware for both halves
       - name: Build firmware
         run: |
           west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=lily58_left -DZMK_CONFIG=$GITHUB_WORKSPACE/config
@@ -29,6 +31,7 @@ jobs:
           west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=lily58_right -DZMK_CONFIG=$GITHUB_WORKSPACE/config
           cp build/zephyr/zmk.uf2 firmware_right.uf2
 
+      # Upload resulting artifacts
       - uses: actions/upload-artifact@v4
         with:
           name: firmware
